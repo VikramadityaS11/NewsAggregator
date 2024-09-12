@@ -1,126 +1,76 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Login">
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="375dp"
-        android:layout_height="191dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+package com.example.myapplication;
 
 
-        app:layout_constraintVertical_bias="0.229"
-        tools:srcCompat="@tools:sample/avatars" />
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="283dp"
-        android:layout_height="47dp"
-        android:fontFamily="@font/playfair_display_bold"
-        android:text="News Digest"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.257"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.666" />
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="94dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:fontFamily="@font/news_cycle_bold"
-        android:text="Log in"
-        android:textColor="#0B0A0A"
-        android:textSize="31sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.104"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.myapplication.databinding.LoginActivityBinding;
 
-    <EditText
-        android:id="@+id/userEmail"
-        style="@android:style/Widget.DeviceDefault.EditText"
-        android:layout_width="350dp"
-        android:layout_height="49dp"
-        android:background="@drawable/shape"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        android:hint=" email@domain.com"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.54"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:layout_constraintVertical_bias="0.068" />
+public class Login extends AppCompatActivity {
+    private LoginActivityBinding binding;
+    ImageView imageView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        binding = LoginActivityBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-    <EditText
-        android:id="@+id/userPassword"
-        style="@android:style/Widget.DeviceDefault.EditText"
-        android:layout_width="350dp"
-        android:layout_height="49dp"
-        android:background="@drawable/shape"
-        android:ems="10"
-        android:inputType="text"
-        android:hint=" Enter your password"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.54"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userEmail"
-        app:layout_constraintVertical_bias="0.094" />
+        Glide.with(Login.this).asGif().load(R.raw.login_logo).diskCacheStrategy(DiskCacheStrategy.DATA).into(binding.imageView);
+        binding.loginbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateForm()) {
+                    Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        binding.signupbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Login.this, signUp.class);
+                Login.this.startActivity(i);
+            }
+        });
+    }
 
-    <androidx.appcompat.widget.AppCompatButton
+    private boolean validateForm() {
+        String email = binding.userEmail.getText().toString().trim();
+        String password = binding.userPassword.getText().toString().trim();
+        if (TextUtils.isEmpty(email)) {
+            binding.userEmail.setError("Email is required");
+            return false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.userEmail.setError("Invalid email format");
+            return false;
+        }
+        if (TextUtils.isEmpty(password)) {
+            binding.userPassword.setError("Password is required");
+            return false;
+        } else if (password.length() < 6) {
+            binding.userPassword.setError("Password must be at least 6 characters long");
+            return false;
+        }
+        return true;
+    }
+    }
 
-        android:id="@+id/loginbtn"
-        android:layout_width="348dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="32dp"
-        android:background="#000000"
-        android:text="Log in"
-        android:textColor="#FBFAFA"
-        app:cornerRadius="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.523"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userPassword" />
-
-    <View
-        android:id="@+id/line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="36dp"
-        android:background="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginbtn" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/signupbtn"
-        android:layout_width="348dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="32dp"
-        android:background="#000000"
-        android:text="Sign Up"
-        android:textColor="#FDFCFC"
-        app:cornerRadius="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.523"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/line" />
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
